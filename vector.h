@@ -76,7 +76,7 @@ mlib_vec_for_each_index_reverse(vec, idx)
 
 
 
-#define MLIB_VEC_DEFAULT_CAPACITY 48
+#define MLIB_VEC_DEFAULT_CAPACITY 32
 
 
 
