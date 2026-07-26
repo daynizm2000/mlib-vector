@@ -297,7 +297,7 @@ mlib_vec_for_each_index_reverse(vec, idx)
                                 ((vec)->size - (idx) - 1) * (vec)->item_size);  \
                 }                                                               \
                                                                                 \
-                __mlibvec_vec->size--;                                          \
+                (vec)->size--;                                                  \
         })
 
 #define mlib_vec_remove(vec, idx) ({                                                    \
