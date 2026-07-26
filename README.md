@@ -16,7 +16,8 @@ MLib Vector provides a simple interface for creating and managing dynamic arrays
 - Resize and reserve storage
 - Shrink allocated memory
 - Copy and swap vectors
-- Multiple iteration macros
+- Pointer and index iteration macros
+- Forward and reverse iteration
 - Access to raw data pointer
 
 ## Requirements
@@ -137,25 +138,50 @@ mlib_vec_shrink_to_fit(&numbers);
 
 # Iteration
 
-Loop through all elements
+Iterate over elements using a pointer.
 
 ```c
-mlib_vec_for_each(&numbers, i)
+int *it;
+
+mlib_vec_for_each(&numbers, it)
+{
+    printf("%d\n", *it);
+}
+```
+
+Iterate using an index.
+
+```c
+size_t i;
+
+mlib_vec_for_each_index(&numbers, i)
 {
     printf("%d\n", numbers.data[i]);
 }
 ```
 
-Loop over allocated capacity
+Reverse iteration with a pointer.
 
 ```c
-mlib_vec_for_each_capacity(&numbers, i)
+int *it;
+
+mlib_vec_for_each_reverse(&numbers, it)
 {
-    ...
+    printf("%d\n", *it);
 }
 ```
 
-Several additional iteration macros are available, including reverse iteration, pointer iteration, and value iteration.
+Reverse iteration using an index.
+
+```c
+size_t i;
+
+mlib_vec_for_each_index_reverse(&numbers, i)
+{
+    printf("%d\n", numbers.data[i]);
+}
+```
+
 
 ---
 
@@ -283,6 +309,9 @@ The library provides the following interfaces.
 
 ## Iteration
 
-Includes multiple forward and reverse iteration macros for indexes, pointers, values, and capacities.
+- `mlib_vec_for_each`
+- `mlib_vec_for_each_index`
+- `mlib_vec_for_each_reverse`
+- `mlib_vec_for_each_index_reverse`
 
 ---

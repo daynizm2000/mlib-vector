@@ -1,4 +1,4 @@
-// A simple example of using the library (not all interfaces are described)
+// A simple example demonstrating the basic usage of MLib Vector
 
 
 #include "vector.h"
@@ -7,21 +7,21 @@
 
 int main(void)
 {
-        size_t end;
+        int *p;
 
 
         mlib_vec_define(array, int, 3);
         mlib_vec_init(&array);
 
 
-        mlib_vec_for_each_capacity(&array, i) {
+        for (size_t i = 0; i < mlib_vec_capacity(&array); i++) {
                 mlib_vec_push(&array, i);
 
                 printf("Added: %d\n", *mlib_vec_back(&array));
         }
 
 
-        for (size_t i = 0, end = mlib_vec_size(&array); i < end; i++)
+        mlib_vec_for_each(&array, p)
                 printf("Removed: %d\n", mlib_vec_pop(&array));
 
 

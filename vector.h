@@ -426,54 +426,18 @@ mlib_vec_for_each_index_reverse(vec, idx)
         } while (0)
 
 
-#define mlib_vec_for_each(vec, idx) \
-        for (size_t (idx) = 0; (vec) && (vec)->data && (idx) < (vec)->size; (idx)++)
-
-
-#define mlib_vec_for_each_capacity(vec, idx) \
-        for (size_t (idx) = 0; (vec) && (vec)->data && (idx) < (vec)->capacity; (idx)++)
-
-
-#define mlib_vec_for_each_val(vec, elem) \
-        for (size_t __mlibvec_idx = 0; \
-                (vec) && (vec)->data && __mlibvec_idx < (vec)->size && (((elem) = (vec)->data[__mlibvec_idx]), 1); \
-                __mlibvec_idx++)
-
-
-#define mlib_vec_for_each_ptr(vec, elem) \
-        for (size_t __mlibvec_idx = 0; \
-                (vec) && (vec)->data && __mlibvec_idx < (vec)->size && (((elem) = &(vec)->data[__mlibvec_idx]), 1); \
-                __mlibvec_idx++)
-
+#define mlib_vec_for_each(vec, p) \
+        for ((p) = (vec)->data; (vec)->data && (vec)->size && (p) < ((vec)->data + (vec)->size); (p)++)
 
 #define mlib_vec_for_each_index(vec, idx) \
-        for ( ; (vec) && (vec)->data && (idx) < (vec)->size; (idx)++)
+        for ((idx) = 0; (vec)->data && (idx) < (vec)->size; (idx)++)
 
-
-#define mlib_vec_for_each_index_capacity(vec, idx) \
-        for ( ; (vec) && (vec)->data && (idx) < (vec)->capacity; (idx)++)
-
-
-#define mlib_vec_for_each_reverse(vec, idx) \
-        for (size_t (idx) = (vec)->size; (vec) && (vec)->data && (idx)-- > 0; )
-
-
-#define mlib_vec_for_each_capacity_reverse(vec, idx) \
-        for (size_t (idx) = (vec)->capacity; (vec) && (vec)->data && (idx)-- > 0; )
-
-
-#define mlib_vec_for_each_val_reverse(vec, elem) \
-        for (size_t __mlibvec_idx = (vec)->size; \
-                (vec) && (vec)->data && __mlibvec_idx-- > 0 && (((elem) = (vec)->data[__mlibvec_idx]), 1); )
-
-
-#define mlib_vec_for_each_ptr_reverse(vec, elem) \
-        for (size_t __mlibvec_idx = (vec)->size; \
-                (vec) && (vec)->data && __mlibvec_idx-- > 0 && (((elem) = &(vec)->data[__mlibvec_idx]), 1); )
-
+#define mlib_vec_for_each_reverse(vec, p) \
+        for ((p) = (vec)->data + (vec)->size - 1; (vec)->size && (vec)->data && (p) >= (vec)->data; (p)--)
 
 #define mlib_vec_for_each_index_reverse(vec, idx) \
-        for ( ; (vec) && (vec)->data && ~(idx); (idx)--)
+        for ((idx) = (vec)->size; (vec)->data && (idx) > 0; ) \
+                if (--(idx), 1)
 
 
 #define mlib_vec_size(vec)              ((vec)->size)
