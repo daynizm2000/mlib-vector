@@ -10,7 +10,7 @@ int main(void)
         int *p;
 
 
-        mlib_vec_define(array, int, 3);
+        mlib_vec_define(array, int, 3, 0);
         mlib_vec_init(&array);
 
 

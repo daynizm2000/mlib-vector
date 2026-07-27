@@ -6,7 +6,7 @@
 --Type definition and initialization
 mlib_vec_type(type)
 mlib_vec_setup(vec, cap)
-mlib_vec_define(name, type, cap)
+mlib_vec_define(name, type, cap, attr_val)
 mlib_vec_init(vec)
 
 
@@ -50,16 +50,9 @@ mlib_vec_copy(dst, src)
 
 
 --Iteration (loops)
-mlib_vec_for_each(vec, idx)
-mlib_vec_for_each_capacity(vec, idx)
-mlib_vec_for_each_val(vec, elem)
-mlib_vec_for_each_ptr(vec, elem)
+mlib_vec_for_each(vec, p)
 mlib_vec_for_each_index(vec, idx)
-mlib_vec_for_each_index_capacity(vec, idx)
-mlib_vec_for_each_reverse(vec, idx)
-mlib_vec_for_each_capacity_reverse(vec, idx)
-mlib_vec_for_each_val_reverse(vec, elem)
-mlib_vec_for_each_ptr_reverse(vec, elem)
+mlib_vec_for_each_reverse(vec, p)
 mlib_vec_for_each_index_reverse(vec, idx)
 
 
@@ -97,52 +90,106 @@ mlib_vec_for_each_index_reverse(vec, idx)
 
 // LIBRARY
 
+
+
+typedef struct {
+        struct {
+                void *(*alloc)(size_t size, void *arg);
+                void *(*realloc)(void *addr, size_t newsize, void *arg);
+                void (*free)(void *addr, void *arg);
+        } mem_ops;
+
+        void *private_data;
+} mlib_vec_attr_t;
+
+
+
+static inline void *mlib_vec_default_alloc(size_t size, void *arg)
+{
+        return malloc(size);
+}
+
+
+static inline void *mlib_vec_default_realloc(void *addr, size_t newsize, void *arg)
+{
+        return realloc(addr, newsize);
+}
+
+
+static inline void mlib_vec_default_free(void *addr, void *arg)
+{
+        free(addr);
+}
+
+
+
 #define mlib_vec_type(type)                     \
         struct {                                \
                 type *data;                     \
                 size_t size;                    \
                 size_t capacity;                \
                 size_t item_size;               \
+                mlib_vec_attr_t attr;           \
         }
 
 
-#define __mlib_vec_setup(vec, cap) do {                                         \
-                (vec)->data = NULL;                                             \
-                (vec)->size = 0;                                                \
-                (vec)->capacity = ((cap)) ? (cap) : MLIB_VEC_DEFAULT_CAPACITY;  \
-                (vec)->item_size = sizeof(__typeof__((vec)->data[0]));          \
+#define __mlib_vec_setup(vec, cap, attr) do {                                                   \
+                (vec)->data = NULL;                                                             \
+                (vec)->size = 0;                                                                \
+                (vec)->capacity = ((cap)) ? (cap) : MLIB_VEC_DEFAULT_CAPACITY;                  \
+                (vec)->item_size = sizeof(__typeof__((vec)->data[0]));                          \
+                ((attr) ? (vec)->attr = *(attr) : memset((vec)->attr, 0, sizeof(*(vec))));      \
         } while (0)
 
-#define mlib_vec_setup(vec, cap) do {                           \
+#define mlib_vec_setup(vec, cap, attr) do {                     \
                 __typeof__(vec) __mlibvec_vec = (vec);          \
                 __typeof__(cap) __mlibvec_cap = (cap);          \
+                __typeof__(attr) __mlibvec_attr = (attr);       \
                                                                 \
-                __mlib_vec_setup(__mlibvec_vec, __mlibvec_cap); \
+                __mlib_vec_setup(__mlibvec_vec, __mlibvec_cap,  \
+                        __mlibvec_attr);                        \
         } while (0)
 
 
-#define mlib_vec_define(name, type, cap)                                                                \
-                mlib_vec_type(type) name = {                                                            \
-                        .data = NULL,                                                                   \
-                        .size = 0,                                                                      \
-                        .capacity = ((cap)) ? (cap) : MLIB_VEC_DEFAULT_CAPACITY,                        \
-                        .item_size = sizeof(type)                                                       \
+#define mlib_vec_define(name, type, cap, attr_val)                                      \
+                mlib_vec_type(type) name = {                                            \
+                        .data = NULL,                                                   \
+                        .size = 0,                                                      \
+                        .capacity = ((cap)) ? (cap) : MLIB_VEC_DEFAULT_CAPACITY,        \
+                        .item_size = sizeof(type),                                      \
+                        .attr = _Generic((attr_val),                                    \
+                                        int: (mlib_vec_attr_t){0},                      \
+                                        void*: (mlib_vec_attr_t){0},                    \
+                                        default: attr_val),                             \
                 }
 
 
-#define __mlib_vec_init(vec) ({                                                 \
-                int __mlibvec_init_ret = 0;                                     \
-                                                                                \
-                if (!(vec)->capacity) {                                         \
-                        (vec)->capacity = MLIB_VEC_DEFAULT_CAPACITY;            \
-                }                                                               \
-                                                                                \
-                if (!((vec)->data =                                             \
-                        malloc((vec)->item_size * (vec)->capacity))) {          \
-                                __mlibvec_init_ret = -1;                        \
-                }                                                               \
-                                                                                \
-                __mlibvec_init_ret;                                             \
+#define __mlib_vec_init(vec) ({                                                         \
+                int __mlibvec_init_ret = 0;                                             \
+                                                                                        \
+                                                                                        \
+                if (!(vec)->attr.mem_ops.alloc) {                                       \
+                        (vec)->attr.mem_ops.alloc = mlib_vec_default_alloc;             \
+                }                                                                       \
+                if (!(vec)->attr.mem_ops.realloc) {                                     \
+                        (vec)->attr.mem_ops.realloc = mlib_vec_default_realloc;         \
+                }                                                                       \
+                if (!(vec)->attr.mem_ops.free) {                                        \
+                        (vec)->attr.mem_ops.free = mlib_vec_default_free;               \
+                }                                                                       \
+                                                                                        \
+                                                                                        \
+                if (!(vec)->capacity) {                                                 \
+                        (vec)->capacity = MLIB_VEC_DEFAULT_CAPACITY;                    \
+                }                                                                       \
+                                                                                        \
+                if (!((vec)->data =                                                     \
+                        (vec)->attr.mem_ops.alloc((vec)->item_size * (vec)->capacity,   \
+                                                (vec)->attr.private_data))) {           \
+                                __mlibvec_init_ret = -1;                                \
+                }                                                                       \
+                                                                                        \
+                __mlibvec_init_ret;                                                     \
         })
 
 #define mlib_vec_init(vec) ({                                                                   \
@@ -185,7 +232,9 @@ mlib_vec_for_each_index_reverse(vec, idx)
 #define __mlib_vec_reserve(vec, newcap) ({                                      \
                 int __mlibvec_reserve_ret = 0;                                  \
                 __typeof__((vec)->data) __mlibvec_reserve_tmp =                 \
-                        realloc((vec)->data, (newcap) * (vec)->item_size);      \
+                        (vec)->attr.mem_ops.realloc((vec)->data,                \
+                                (newcap) * (vec)->item_size,                    \
+                                (vec)->attr.private_data);                      \
                                                                                 \
                 if (!__mlibvec_reserve_tmp) {                                   \
                         __mlibvec_reserve_ret = -1;                             \
@@ -406,15 +455,16 @@ mlib_vec_for_each_index_reverse(vec, idx)
         } while (0)
 
 
-#define __mlib_vec_destroy(vec) do {            \
-                if ((vec)->data) {              \
-                        free((vec)->data);      \
-                        (vec)->data = NULL;     \
-                }                               \
-                                                \
-                (vec)->capacity = 0;            \
-                (vec)->item_size = 0;           \
-                (vec)->size =  0;               \
+#define __mlib_vec_destroy(vec) do {                            \
+                if ((vec)->data) {                              \
+                        (vec)->attr.mem_ops.free((vec)->data,   \
+                                (vec)->attr.private_data);      \
+                        (vec)->data = NULL;                     \
+                }                                               \
+                                                                \
+                (vec)->capacity = 0;                            \
+                (vec)->item_size = 0;                           \
+                (vec)->size =  0;                               \
         } while (0)
 
 #define mlib_vec_destroy(vec) do {                              \
@@ -473,6 +523,7 @@ mlib_vec_for_each_index_reverse(vec, idx)
                 MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->size, &__mlibvec_vec2->size);               \
                 MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->capacity, &__mlibvec_vec2->capacity);       \
                 MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->item_size, &__mlibvec_vec2->item_size);     \
+                MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->attr, &__mlibvec_vec2->attr);               \
         } while (0)
 
 
