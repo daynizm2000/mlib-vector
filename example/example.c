@@ -1,7 +1,7 @@
 // A simple example demonstrating the basic usage of MLib Vector
 
 
-#include "vector.h"
+#include "../vector/vector.h"
 #include <stdio.h>
 
 

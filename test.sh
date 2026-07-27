@@ -1,11 +1,14 @@
 #!/bin/bash
 
 
-if [ ! -f vector ]; then
+cd example/
+
+
+if [ ! -f "example_bin" ]; then
     make
 fi
 
 
-./vector
+./example_bin
 
-rm vector
+rm example_bin
