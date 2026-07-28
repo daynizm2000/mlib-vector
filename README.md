@@ -27,7 +27,7 @@ You can optionally plug in your own memory allocator to control how memory is ob
 
 ## Requirements
 
-- GCC or Clang with GNU extensions (`__typeof__`, statement expressions)
+- GCC or Clang with GNU extensions (`typeof`, statement expressions)
 - C11 or later
 - Only the C standard library is required (`<stdlib.h>`, `<memory.h>`)
 

@@ -81,9 +81,9 @@ mlib_vec_for_each_index_reverse(vec, idx)
 // UTILS
 
 #define MLIB_VEC_UTIL_SWAP(a, b) do {                                   \
-                __typeof__(a) __mlibvec_a = (a);                        \
-                __typeof__(b) __mlibvec_b = (b);                        \
-                __typeof__(*a) __mlibvec_tmp = *__mlibvec_a;            \
+                typeof(a) __mlibvec_a = (a);                        \
+                typeof(b) __mlibvec_b = (b);                        \
+                typeof(*a) __mlibvec_tmp = *__mlibvec_a;            \
                                                                         \
                 *__mlibvec_a = *__mlibvec_b;                            \
                 *__mlibvec_b = __mlibvec_tmp;                           \
@@ -141,7 +141,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
                 (vec)->data = NULL;                                             \
                 (vec)->size = 0;                                                \
                 (vec)->capacity = ((cap)) ? (cap) : MLIB_VEC_DEFAULT_CAPACITY;  \
-                (vec)->item_size = sizeof(__typeof__((vec)->data[0]));          \
+                (vec)->item_size = sizeof(typeof((vec)->data[0]));          \
                 (vec)->attr = _Generic((attr_val),                              \
                         int: (mlib_vec_attr_t){0},                              \
                         void*: (mlib_vec_attr_t){0},                            \
@@ -149,9 +149,9 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
         } while (0)
 
 #define mlib_vec_setup(vec, cap, attr_val) do {                         \
-                __typeof__(vec) __mlibvec_vec = (vec);                  \
-                __typeof__(cap) __mlibvec_cap = (cap);                  \
-                __typeof__(attr_val) __mlibvec_attr_val = (attr_val);   \
+                typeof(vec) __mlibvec_vec = (vec);                  \
+                typeof(cap) __mlibvec_cap = (cap);                  \
+                typeof(attr_val) __mlibvec_attr_val = (attr_val);   \
                                                                         \
                 __mlib_vec_setup(__mlibvec_vec, __mlibvec_cap,          \
                         __mlibvec_attr_val);                            \
@@ -201,7 +201,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define mlib_vec_init(vec) ({                                                                   \
                 int __mlibvec_ret = 0;                                                          \
-                __typeof__(vec) __mlibvec_vec = (vec);                                          \
+                typeof(vec) __mlibvec_vec = (vec);                                          \
                                                                                                 \
                 if (!__mlibvec_vec || !__mlibvec_vec->item_size) {                              \
                         __mlibvec_ret = -1;                                                     \
@@ -215,19 +215,19 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_get(vec, idx) ({ \
-                __typeof__(vec) __mlibvec_vec = (vec);                                                  \
-                __typeof__(idx) __mlibvec_idx = (idx);                                                  \
+                typeof(vec) __mlibvec_vec = (vec);                                                  \
+                typeof(idx) __mlibvec_idx = (idx);                                                  \
                                                                                                         \
-                (!__mlibvec_vec || !__mlibvec_vec->data) ? (__typeof__(__mlibvec_vec->data[0])){0} :    \
-                ((__mlibvec_idx) >= __mlibvec_vec->size) ? (__typeof__(__mlibvec_vec->data[0])){0} :    \
+                (!__mlibvec_vec || !__mlibvec_vec->data) ? (typeof(__mlibvec_vec->data[0])){0} :    \
+                ((__mlibvec_idx) >= __mlibvec_vec->size) ? (typeof(__mlibvec_vec->data[0])){0} :    \
                 __mlibvec_vec->data[(__mlibvec_idx)];                                                   \
         })
 
 
 #define mlib_vec_set(vec, elem, idx) ({                                         \
-                __typeof__(vec) __mlibvec_vec = (vec);                          \
-                __typeof__(idx) __mlibvec_idx = (idx);                          \
-                __typeof__(elem) __mlibvec_elem = (elem);                       \
+                typeof(vec) __mlibvec_vec = (vec);                          \
+                typeof(idx) __mlibvec_idx = (idx);                          \
+                typeof(elem) __mlibvec_elem = (elem);                       \
                                                                                 \
                 (!__mlibvec_vec) ? -1 :                                         \
                 (!__mlibvec_vec->data) ? -1 :                                   \
@@ -238,7 +238,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define __mlib_vec_reserve(vec, newcap) ({                                      \
                 int __mlibvec_reserve_ret = 0;                                  \
-                __typeof__((vec)->data) __mlibvec_reserve_tmp =                 \
+                typeof((vec)->data) __mlibvec_reserve_tmp =                 \
                         (vec)->attr.mem_ops.realloc((vec)->data,                \
                                 (newcap) * (vec)->item_size,                    \
                                 (vec)->attr.private_data);                      \
@@ -256,8 +256,8 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define mlib_vec_reserve(vec, newcap) ({                                                \
                 int __mlibvec_ret = 0;                                                  \
-                __typeof__(vec) __mlibvec_vec = (vec);                                  \
-                __typeof__(newcap) __mlibvec_newcap = (newcap);                         \
+                typeof(vec) __mlibvec_vec = (vec);                                  \
+                typeof(newcap) __mlibvec_newcap = (newcap);                         \
                                                                                         \
                 if (!__mlibvec_vec) {                                                   \
                         __mlibvec_ret = -1;                                             \
@@ -280,8 +280,8 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define mlib_vec_push(vec, elem) ({                                                             \
                 int __mlibvec_ret = 0;                                                          \
-                __typeof__(vec) __mlibvec_vec = (vec);                                          \
-                __typeof__(elem) __mlibvec_elem = (elem);                                       \
+                typeof(vec) __mlibvec_vec = (vec);                                          \
+                typeof(elem) __mlibvec_elem = (elem);                                       \
                                                                                                 \
                 if (!__mlibvec_vec) {                                                           \
                         __mlibvec_ret = -1;                                                     \
@@ -303,9 +303,9 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_pop(vec) ({                                                            \
-                __typeof__(vec) __mlibvec_vec = (vec);                                  \
-                __typeof__(__mlibvec_vec->data[0]) __mlibvec_ret =                      \
-                        (__typeof__(__mlibvec_vec->data[0])){0};                        \
+                typeof(vec) __mlibvec_vec = (vec);                                  \
+                typeof(__mlibvec_vec->data[0]) __mlibvec_ret =                      \
+                        (typeof(__mlibvec_vec->data[0])){0};                        \
                                                                                         \
                 if (__mlibvec_vec && __mlibvec_vec->data && __mlibvec_vec->size) {      \
                         __mlibvec_ret = __mlibvec_vec->data[__mlibvec_vec->size - 1];   \
@@ -318,9 +318,9 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define mlib_vec_insert(vec, elem, idx) ({                                                      \
                 int __mlibvec_ret = 0;                                                          \
-                __typeof__(vec) __mlibvec_vec = (vec);                                          \
-                __typeof__(elem) __mlibvec_elem = (elem);                                       \
-                __typeof__(idx) __mlibvec_idx = (idx);                                          \
+                typeof(vec) __mlibvec_vec = (vec);                                          \
+                typeof(elem) __mlibvec_elem = (elem);                                       \
+                typeof(idx) __mlibvec_idx = (idx);                                          \
                                                                                                 \
                 if (!__mlibvec_vec || !__mlibvec_vec->data                                      \
                         || __mlibvec_idx > __mlibvec_vec->size) {                               \
@@ -345,7 +345,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define __mlib_vec_remove(vec, idx) ({                                          \
-                __typeof__((vec)->data[0]) __mlibvec_ret = (vec)->data[(idx)];  \
+                typeof((vec)->data[0]) __mlibvec_ret = (vec)->data[(idx)];  \
                                                                                 \
                 if ((idx) != ((vec)->size - 1)) {                               \
                         memmove(&(vec)->data[(idx)],                            \
@@ -358,10 +358,10 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
         })
 
 #define mlib_vec_remove(vec, idx) ({                                                    \
-                __typeof__(vec) __mlibvec_vec = (vec);                                  \
-                __typeof__(idx) __mlibvec_idx = (idx);                                  \
-                __typeof__(__mlibvec_vec->data[0]) __mlibvec_ret =                      \
-                        (__typeof__(__mlibvec_vec->data[0])){0};                        \
+                typeof(vec) __mlibvec_vec = (vec);                                  \
+                typeof(idx) __mlibvec_idx = (idx);                                  \
+                typeof(__mlibvec_vec->data[0]) __mlibvec_ret =                      \
+                        (typeof(__mlibvec_vec->data[0])){0};                        \
                                                                                         \
                 if (__mlibvec_vec && __mlibvec_idx >= 0                                 \
                                 && __mlibvec_idx < __mlibvec_vec->size) {               \
@@ -374,9 +374,9 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_erase(vec, start, end) ({                                      \
-                __typeof__(vec) __mlibvec_vec = (vec);                          \
-                __typeof__(start) __mlibvec_start = (start);                    \
-                __typeof__(end) __mlibvec_end = (end);                          \
+                typeof(vec) __mlibvec_vec = (vec);                          \
+                typeof(start) __mlibvec_start = (start);                    \
+                typeof(end) __mlibvec_end = (end);                          \
                 int __mlibvec_ret = 0;                                          \
                                                                                 \
                 if (!__mlibvec_vec || !__mlibvec_vec->data                      \
@@ -400,7 +400,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_shrink_to_fit(vec) ({                                                          \
-                __typeof__(vec) __mlibvec_vec = (vec);                                          \
+                typeof(vec) __mlibvec_vec = (vec);                                          \
                 int __mlibvec_ret = 0;                                                          \
                                                                                                 \
                 if (!__mlibvec_vec || !__mlibvec_vec->data) {                                   \
@@ -419,10 +419,10 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 #define mlib_vec_resize(vec, newsize, ...) ({                                                           \
                 int __mlibvec_ret = 0;                                                                  \
-                __typeof__(vec) __mlibvec_vec = (vec);                                                  \
-                __typeof__(newsize) __mlibvec_newsize = (newsize);                                      \
-                __typeof__(__mlibvec_vec->data[0]) __mlibvec_fill_val =                                 \
-                        __VA_OPT__(__VA_ARGS__ +) (__typeof__(__mlibvec_vec->data[0])){0};              \
+                typeof(vec) __mlibvec_vec = (vec);                                                  \
+                typeof(newsize) __mlibvec_newsize = (newsize);                                      \
+                typeof(__mlibvec_vec->data[0]) __mlibvec_fill_val =                                 \
+                        __VA_OPT__(__VA_ARGS__ +) (typeof(__mlibvec_vec->data[0])){0};              \
                                                                                                         \
                 if (!__mlibvec_vec) {                                                                   \
                         __mlibvec_ret = -1;                                                             \
@@ -456,7 +456,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_clear(vec) do {                        \
-                __typeof__(vec) __mlibvec_vec = (vec);  \
+                typeof(vec) __mlibvec_vec = (vec);  \
                                                         \
                 if (__mlibvec_vec) {                    \
                         __mlibvec_vec->size = 0;        \
@@ -477,7 +477,7 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
         } while (0)
 
 #define mlib_vec_destroy(vec) do {                              \
-                __typeof__(vec) __mlibvec_vec = (vec);          \
+                typeof(vec) __mlibvec_vec = (vec);          \
                                                                 \
                 if (__mlibvec_vec) {                            \
                         __mlib_vec_destroy(__mlibvec_vec);      \
@@ -505,18 +505,18 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_back(vec) ({                                                           \
-                __typeof__(vec) __mlibvec_vec = (vec);                                  \
+                typeof(vec) __mlibvec_vec = (vec);                                  \
                                                                                         \
                 (__mlibvec_vec->size) ? &__mlibvec_vec->data[__mlibvec_vec->size - 1]   \
-                : (__typeof__(__mlibvec_vec->data[0])*)0;                               \
+                : (typeof(__mlibvec_vec->data[0])*)0;                               \
         })
 
 
 #define mlib_vec_front(vec) ({ \
-                __typeof__(vec) __mlibvec_vec = (vec);                                  \
+                typeof(vec) __mlibvec_vec = (vec);                                  \
                                                                                         \
                 (__mlibvec_vec->size) ? &__mlibvec_vec->data[0]                         \
-                : (__typeof__(__mlibvec_vec->data[0])*)0;                               \
+                : (typeof(__mlibvec_vec->data[0])*)0;                               \
         })
 
 
@@ -525,8 +525,8 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_swap(vec1, vec2) do {                                                          \
-                __typeof__(vec1) __mlibvec_vec1 = (vec1);                                       \
-                __typeof__(vec2) __mlibvec_vec2 = (vec2);                                       \
+                typeof(vec1) __mlibvec_vec1 = (vec1);                                       \
+                typeof(vec2) __mlibvec_vec2 = (vec2);                                       \
                                                                                                 \
                 MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->data, &__mlibvec_vec2->data);               \
                 MLIB_VEC_UTIL_SWAP(&__mlibvec_vec1->size, &__mlibvec_vec2->size);               \
@@ -537,8 +537,8 @@ static inline void mlib_vec_default_free(void *addr, void *arg)
 
 
 #define mlib_vec_copy(dst, src) ({                                                      \
-                __typeof__(dst) __mlibvec_dst = (dst);                                  \
-                __typeof__(src) __mlibvec_src = (src);                                  \
+                typeof(dst) __mlibvec_dst = (dst);                                  \
+                typeof(src) __mlibvec_src = (src);                                  \
                 int __mlibvec_ret = 0;                                                  \
                                                                                         \
                 if (!__mlibvec_dst || !__mlibvec_src) {                                 \
